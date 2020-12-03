@@ -175,24 +175,76 @@ function createAppointment(e) {
     })
     .then(resp => resp.json())
     .then(appointment => {
-        renderAppointment(appointment)
+        renderAppointment(pet, appointment)
     })
 }
 
-function renderAppointment(appointment) {
+function renderAppointment(pet, appointment) {
     const main = document.getElementById('info-form')
-    main.innerHTML = ''
-    // addCalendar(appointment)
-    const calendar = document.querySelector('#calendar')
-    calendar.setAttribute('style', '')
-
+    main.setAttribute("style", "display: none;")
+     
     const header = document.createElement('h3')
     header.textContent = 'Appointment List'
     main.appendChild(header)
+
+    const calendar = document.querySelector('#calendar')
+    calendar.setAttribute('style', '')
+    populateCalendar(pet, appointment)
+
 }
 
-// const calendar = document.querySelector('#calendar')
-// calendar.setAttribute('style', '')
+function populateCalendar(pet, appointment){
+    // set as global variables to repopulate calendar after pressing next/previous
+    apmnt = appointment
+    petName = pet.value
+
+    // const li = document.createElement('li')
+    // li.textContent = `${petName}`
+    // li.addEventListener('click', renderAppointmentDetails)
+    
+    // const appointmentList = document.createElement('ul')
+    // appointmentList.appendChild(li)
+    
+    const sDate = appointment.start_date.split('-')[2]
+    const eDate = appointment.end_date.split('-')[2]
+    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+        const li = document.createElement('li')
+        li.textContent = `${petName}`
+        li.addEventListener('click', renderAppointmentDetails)
+
+        const appointmentList = document.createElement('ul')
+        appointmentList.appendChild(li)
+
+        const startDate = document.getElementById(`0${i}`)
+        // debugger
+        startDate.appendChild(appointmentList)
+    }
+}
+
+function renderAppointmentDetails(e) {
+    // debugger 
+    const info = document.getElementById('appointment-info')
+    info.innerHTML = ''
+    
+    const name = document.createElement('li')
+    name.textContent = `Hooman Name: ${userName.name.split('')[0].toUpperCase() + userName.name.slice(1)}`
+    
+    const pet = document.createElement('li')
+    pet.textContent = `Pet Name: ${e.target.textContent}`
+    
+    const startDate = document.createElement('li')
+    startDate.textContent = `Start Date: ${apmnt.start_date}`
+    
+    const endDate = document.createElement('li')
+    endDate.textContent = `End Date: ${apmnt.end_date}`
+
+    const apmntDetails = document.createElement('ul')
+    apmntDetails.append(name, pet, startDate, endDate)
+
+    const apmntInfo = document.getElementById('appointment-info')
+    apmntInfo.appendChild(apmntDetails)
+}
+
 let today = new Date();
 let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();
@@ -209,12 +261,14 @@ function next() {
     currentYear = (currentMonth === 11) ? currentYear + 1 : currentYear;
     currentMonth = (currentMonth + 1) % 12;
     showCalendar(currentMonth, currentYear);
+    // populateCalendar(petName, apmnt)
 }
 
 function previous() {
     currentYear = (currentMonth === 0) ? currentYear - 1 : currentYear;
     currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
     showCalendar(currentMonth, currentYear);
+    // populateCalendar(petName, apmnt)
 }
 
 function showCalendar(month, year) {
@@ -252,7 +306,7 @@ function showCalendar(month, year) {
 
             else {
                 let cell = document.createElement("td");
-                cell.id = date
+                date.length > 1 ? cell.id = date : cell.id = `0${date}`
                 let cellText = document.createTextNode(date);
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
                     cell.classList.add("bg-info");
@@ -266,11 +320,3 @@ function showCalendar(month, year) {
     }
 }
 
-function populateCalendar(appointment){
-    debugger
-    document.getElementById('2')
-}
-
-// function addCalendar(appointment) {
-
-// }
