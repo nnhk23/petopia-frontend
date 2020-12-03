@@ -11,6 +11,7 @@ body {
 
 .callout {
   background-color: #d1f7f5;
+  padding: 20px;
 }
 
 .cat-pic{
@@ -19,11 +20,25 @@ body {
 }
 
 .side-nav{
-  height: 100vh;
+  height: 120vh;
   position: relative;
   overflow-y: scroll;
 }
 
 h1{
   text-align: center;
+  padding: 10px;
+}
+
+
+
+
+/* CALENDAR */
+.card{
+  width: 1200px;
+  height: fit-content;
+}
+
+table{
+  height: 800px;
 }
