@@ -2,6 +2,8 @@ const BASE_URL = "http://localhost:3000"
 const USERS_URL = `${BASE_URL}/users`
 const PETS_URL = `${BASE_URL}/pets`
 const APMNT_URL = `${BASE_URL}/appointments`
+let apmnt
+let petName
 
 document.addEventListener('DOMContentLoaded', () => {
     getUser()
@@ -64,6 +66,62 @@ function renderGreeting(user) {
 
     const input = document.getElementById('user-sign-in')
     input.innerHTML = ''
+
+    const viewAppointments = document.createElement('button')
+    viewAppointments.textContent = 'View All Appointments'
+    viewAppointments.setAttribute('class', 'btn btn-info')
+    viewAppointments.addEventListener('click', renderAllAppointments)
+
+    const buttonHolder = document.getElementById('left-nav')
+    buttonHolder.appendChild(viewAppointments)
+}
+
+function renderAllAppointments(e) {
+    const petInfo = document.getElementById('pet-info')
+    petInfo.innerHTML = ''
+
+    const calendar = document.getElementById('calendar')
+    calendar.setAttribute('style', '')
+
+    const id = userName.id
+
+    fetch(USERS_URL + '/' + id)
+    .then(resp => resp.json())
+    .then(data => populateAllAppointments(data))
+}
+
+function populateAllAppointments(data) {
+    console.log(data)
+    let objName
+    data.appointments.forEach(appointment => {
+        data.pets.forEach(pet => {
+            if (pet.id == appointment.pet_id){
+                objName = pet.name
+                debugger
+            }
+        })
+        const sDate = appointment.start_date.split('-')[2]
+        const eDate = appointment.end_date.split('-')[2]
+
+        let limit
+        eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
+        // add pet name to calendar at the matching date
+        for(let i = parseInt(sDate); i < limit; i+=1){
+            const li = document.createElement('li')
+            li.textContent = `${objName}`
+            li.addEventListener('click', renderAppointmentDetails)
+            
+            const appointmentList = document.createElement('ul')
+            appointmentList.appendChild(li)
+            // id for appointment delete function
+            appointmentList.id = `${i}`
+            appointmentList.setAttribute('class', 'apt-list-item') 
+
+            let startDate
+            `${i}`.length > 1 ? startDate = document.getElementById(`${i}`) : startDate = document.getElementById(`0${i}`)
+            startDate.appendChild(appointmentList)
+        }
+    })
 }
 
 function getPetData() {
@@ -188,11 +246,7 @@ function createAppointment(e) {
 function renderCalendar(pet, appointment) {
     const main = document.getElementById('info-form')
     main.setAttribute("style", "display: none;")
-     
-    // const header = document.createElement('h3')
-    // header.textContent = 'Appointment List'
-    // main.appendChild(header)
-
+ 
     const calendar = document.querySelector('#calendar')
     calendar.setAttribute('style', '')
     populateCalendar(pet, appointment)
@@ -200,15 +254,19 @@ function renderCalendar(pet, appointment) {
 
 function populateCalendar(pet, appointment){
     // set as global variable to repopulate calendar after pressing next/previous
-    apmnt = appointment
-    petName = pet
-    
+    // debugger
+    if (!apmnt){
+        apmnt = appointment
+        petName = pet
+    }
     // get day only from start/end date
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
 
+    let limit
+    eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
     // add pet name to calendar at the matching date
-    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+    for(let i = parseInt(sDate); i < limit; i+=1){
         const li = document.createElement('li')
         li.textContent = `${petName.value}`
         li.addEventListener('click', renderAppointmentDetails)
@@ -219,7 +277,8 @@ function populateCalendar(pet, appointment){
         appointmentList.id = `${i}`
         appointmentList.setAttribute('class', 'apt-list-item') 
 
-        const startDate = document.getElementById(`0${i}`)
+        let startDate
+        `${i}`.length > 1 ? startDate = document.getElementById(`${i}`) : startDate = document.getElementById(`0${i}`)
         startDate.appendChild(appointmentList)
     }
 }
@@ -253,6 +312,10 @@ function renderAppointmentDetails(e) {
     const deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'Cancel'
     deleteBtn.setAttribute('class', 'btn btn-outline-primary col-sm-6')
+
+    // set confirmation for delete
+    // deleteBtn.setAttribute('onclick', "return confirm('Are you sure about canceling me :'(?');")
+
     deleteBtn.addEventListener('click', deleteAppointment)
 
     const apmntDetails = document.createElement('ul')
@@ -292,6 +355,7 @@ function renderRescheduleForm() {
     rescheduleForm.innerHTML = content
     addEventForResForm()
 
+    // hide appointment info
     const appointmentInfo = document.getElementById('info')
     appointmentInfo.setAttribute('style', 'display: none;')
 }
@@ -299,6 +363,7 @@ function renderRescheduleForm() {
 // add submit event for reschedule form
 function addEventForResForm() {
     const form = document.getElementById('reschedule-form')
+    form.setAttribute('style', '')
     form.addEventListener('submit', (e) => {
         e.preventDefault()
         const newStartDate = e.target.querySelector('#new-start-date').value
@@ -342,31 +407,13 @@ function populateAppointmentWithNewData(data){
 
 // move pet's name to updated date on calendar
 function updateCalendar(data){
-    console.log(data, apmnt)
     // empty out calendar
     emptyCalendar(apmnt)
-
-    const sDate = data.start_date.split('-')[2]
-    const eDate = data.end_date.split('-')[2]
-    // add pet name to calendar at the matching date
-    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
-        const li = document.createElement('li')
-        li.textContent = `${petName.value}`
-        li.addEventListener('click', renderAppointmentDetails)
-        
-        const appointmentList = document.createElement('ul')
-        appointmentList.appendChild(li)
-        // id for appointment delete function
-        appointmentList.id = `${i}`
-
-        // add condition to check if date is 1 or 2 character
-        const startDate = document.getElementById(`0${i}`)
-        startDate.appendChild(appointmentList)
-    }
+    populateCalendar(petName, data)
 }
 
 // cancel appointment
-function deleteAppointment(e) {
+function deleteAppointment() {
     const id = apmnt.id
     fetch(APMNT_URL + '/' + id, {
         method: 'DELETE',
@@ -394,8 +441,11 @@ function deleteAppointment(e) {
 function emptyCalendar(appointment){ 
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
+
+    let limit
+    eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
     // remove pet name to calendar at the matching date
-    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+    for(let i = parseInt(sDate); i < limit; i+=1){
         const appointmentList = document.getElementById(`${i}`)
         appointmentList.innerHTML = ''
     }
@@ -463,8 +513,9 @@ function showCalendar(month, year) {
             }
 
             else {
+                // debugger
                 let cell = document.createElement("td");
-                date.length > 1 ? cell.id = date : cell.id = `0${date}`
+                `${date}`.length > 1 ? cell.id = `${date}` : cell.id = `0${date}`
                 let cellText = document.createTextNode(date);
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
                     cell.classList.add("bg-info1");
