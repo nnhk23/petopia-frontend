@@ -59,12 +59,11 @@ function createUser(e) {
 
 function renderGreeting(user) {  
     userName = user
-    const greeting = document.createElement('h3')
+    const greeting = document.querySelector('h5')
     greeting.textContent = `Welcome ${user.name} to Petopia!`
 
     const input = document.getElementById('user-sign-in')
     input.innerHTML = ''
-    input.appendChild(greeting)
 }
 
 function getPetData() {
@@ -81,8 +80,6 @@ function generatePet(pet) {
 
     const pic = document.createElement('img')
     pic.setAttribute('src', pet.img_url)
-    pic.setAttribute('width', '120px')
-    pic.setAttribute('height', '120px')
     pic.setAttribute('class', 'cat-pic')
     pic.addEventListener('click', () => renderInfo(pet))
 
@@ -91,6 +88,9 @@ function generatePet(pet) {
 }
 
 function renderInfo(pet) {
+    const appointmentForm = document.getElementById('appointment-form')
+    appointmentForm.innerHTML = ''
+
     const pic = document.createElement('img')
     pic.setAttribute('src', pet.img_url)
     pic.setAttribute('width', '450px')
@@ -119,15 +119,17 @@ function renderInfo(pet) {
     })
     
     const ul = document.createElement('ul')
-    ul.append(pic, name, breed, age, kidFriendly, personality, selectBtn)
+    ul.id = 'individual-pet-info'
+    ul.append(name, breed, age, kidFriendly, personality, selectBtn)
 
     const petInfo = document.getElementById('pet-info')
     petInfo.innerHTML = ''
-    petInfo.appendChild(ul)
+    petInfo.append(pic, ul)
 }
 
 function renderForm(pet) {
     const content = `
+    <h2>Appointment Form</h2>
     <form id='appointment-form'>
         <div class="form-group">
             <label>Hooman Name: ${userName.name}</label>
@@ -201,8 +203,10 @@ function populateCalendar(pet, appointment){
     apmnt = appointment
     petName = pet
     
+    // get day only from start/end date
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
+
     // add pet name to calendar at the matching date
     for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
         const li = document.createElement('li')
@@ -211,6 +215,9 @@ function populateCalendar(pet, appointment){
         
         const appointmentList = document.createElement('ul')
         appointmentList.appendChild(li)
+        // id for appointment delete function
+        appointmentList.id = `${i}`
+        appointmentList.setAttribute('class', 'apt-list-item') 
 
         const startDate = document.getElementById(`0${i}`)
         startDate.appendChild(appointmentList)
@@ -219,9 +226,6 @@ function populateCalendar(pet, appointment){
 
 // render new appointment details
 function renderAppointmentDetails(e) {
-    // const info = document.getElementById('appointment-info')
-    // info.innerHTML = ''
-    
     const name = document.createElement('li')
     name.textContent = `Hooman Name: ${userName.name.split('')[0].toUpperCase() + userName.name.slice(1)}`
     
@@ -312,14 +316,15 @@ function addEventForResForm() {
             })
         })
         .then(resp => resp.json())
-        .then(data => populateAppointmentWithNewData(data))
+        .then(data => {
+            populateAppointmentWithNewData(data)
+            updateCalendar(data)
+        })
     })
 }
 
 // populate page with updated appointment data
 function populateAppointmentWithNewData(data){
-    console.log(data, apmnt, userName, petName)
-
     // hide reschedule form
     const rescheduleForm = document.getElementById('reschedule-form')
     rescheduleForm.setAttribute('style', 'display: none;')
@@ -333,6 +338,31 @@ function populateAppointmentWithNewData(data){
     
     const endDate = document.getElementById('info').querySelectorAll('li')[3]
     endDate.textContent = `End Date: ${data.end_date}`
+}
+
+// move pet's name to updated date on calendar
+function updateCalendar(data){
+    console.log(data, apmnt)
+    // empty out calendar
+    emptyCalendar(apmnt)
+
+    const sDate = data.start_date.split('-')[2]
+    const eDate = data.end_date.split('-')[2]
+    // add pet name to calendar at the matching date
+    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+        const li = document.createElement('li')
+        li.textContent = `${petName.value}`
+        li.addEventListener('click', renderAppointmentDetails)
+        
+        const appointmentList = document.createElement('ul')
+        appointmentList.appendChild(li)
+        // id for appointment delete function
+        appointmentList.id = `${i}`
+
+        // add condition to check if date is 1 or 2 character
+        const startDate = document.getElementById(`0${i}`)
+        startDate.appendChild(appointmentList)
+    }
 }
 
 // cancel appointment
@@ -358,25 +388,18 @@ function deleteAppointment(e) {
     appointmentForm.setAttribute('style', 'display: none;')
 
     // clear pet names on calendar when delete
-    // emptyCalendar(petName, apmnt)
+    emptyCalendar(apmnt)
 }
 
-// function emptyCalendar(pet, appointment){ 
-//     const sDate = appointment.start_date.split('-')[2]
-//     const eDate = appointment.end_date.split('-')[2]
-//     // remove pet name to calendar at the matching date
-//     for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
-//         const li = document.createElement('li')
-//         li.textContent = `${pet.value}`
-//         li.addEventListener('click', renderAppointmentDetails)
-
-//         const appointmentList = document.createElement('ul')
-//         appointmentList.appendChild(li)
-
-//         const startDate = document.getElementById(`0${i}`)
-//         startDate.appendChild(appointmentList)
-//     }
-// }
+function emptyCalendar(appointment){ 
+    const sDate = appointment.start_date.split('-')[2]
+    const eDate = appointment.end_date.split('-')[2]
+    // remove pet name to calendar at the matching date
+    for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+        const appointmentList = document.getElementById(`${i}`)
+        appointmentList.innerHTML = ''
+    }
+}
 
 // CALENDAR
 
@@ -444,7 +467,7 @@ function showCalendar(month, year) {
                 date.length > 1 ? cell.id = date : cell.id = `0${date}`
                 let cellText = document.createTextNode(date);
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
-                    cell.classList.add("bg-info");
+                    cell.classList.add("bg-info1");
                 } // color today's date
                 cell.appendChild(cellText);
                 row.appendChild(cell);
