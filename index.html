@@ -10,13 +10,20 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
   integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 </head>
-<body>
 
+
+<body>
+  <nav class="navbar navbar-light bg-light" id="topNav">
+    <a class="navbar-brand" href="#">
+      <img src="https://cdn.iconscout.com/icon/premium/png-256-thumb/cat-paw-961585.png" width="40" height="40" class="d-inline-block align-top" alt="">
+      PETOPIA
+    </a>
+  </nav>
+
+  <!-- side nav bar -->
+  <div id='stuffs'>
   <nav class="side-nav" id="pet-list" data-off-canvas="" data-position="left" aria-hidden="true" data-offcanvas="sccf95-offcanvas">
     <div class="row column">
-      <br>
-      <h1>PETOPIA</h1>
-      <br>
       <div id="list-panel">
         <div id="list">
           <!-- list of pet pics -->
@@ -25,16 +32,8 @@
     </div>
   </nav>
   
-  <!-- <nav class="navbar navbar-light bg-light" id="topNav">
-    <a class="navbar-brand" href="#">
-      <img src="https://www.logoground.com/uploads6/dv6y2019145512019-03-114202019beanpaws.jpg" width="30" height="30" class="d-inline-block align-top" alt="">
-      PETOPIA
-    </a>
-  </nav> -->
-  
+  <!-- main page -->
   <div class="callout primary" id='main-page'>
-  
-
     <div class="row column" id='user-sign-in'>
       <!-- user input name here -->
     </div>
@@ -113,7 +112,13 @@
     </div>
 
     <div id='appointment-info'>
-      <!-- appointment details will go here -->
+      <div id='info'>
+        <!-- appointment details will go here -->
+      </div>
+
+      <div id='reschedule-form'>
+        <!-- rechedule form goes here -->
+      </div>
     </div>
 
     <!-- <button name="jump" onclick="jump()">Go</button> -->
@@ -129,6 +134,7 @@
     <script type="text/javascript" src="./src/index.js"></script>
 
   </div>
+</div>
 
 </body>
 </html>

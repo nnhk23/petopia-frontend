@@ -59,7 +59,7 @@ function createUser(e) {
 
 function renderGreeting(user) {  
     userName = user
-    const greeting = document.createElement('p')
+    const greeting = document.createElement('h3')
     greeting.textContent = `Welcome ${user.name} to Petopia!`
 
     const input = document.getElementById('user-sign-in')
@@ -114,7 +114,9 @@ function renderInfo(pet) {
     const selectBtn = document.createElement('button')
     selectBtn.textContent = 'Choose this fur ball'
     selectBtn.setAttribute('class', 'btn btn-primary')
-    selectBtn.addEventListener('click', (e) => renderForm(e, pet))
+    selectBtn.addEventListener('click', () => {
+        renderForm(pet)
+    })
     
     const ul = document.createElement('ul')
     ul.append(pic, name, breed, age, kidFriendly, personality, selectBtn)
@@ -124,12 +126,11 @@ function renderInfo(pet) {
     petInfo.appendChild(ul)
 }
 
-function renderForm(event, pet) {
+function renderForm(pet) {
     const content = `
     <form id='appointment-form'>
         <div class="form-group">
-            <label>Name: </label>
-            <input type="text" class="form-control" id="user-name" aria-describedby="emailHelp" value="${userName.name}">
+            <label>Hooman Name: ${userName.name}</label>
         </div>
 
         <div class="form-group">
@@ -152,6 +153,9 @@ function renderForm(event, pet) {
 
     const formHolder = document.getElementById('appointment-form')
     formHolder.innerHTML = content
+    if (!(formHolder.innerText === '')) {
+        formHolder.setAttribute('style', '')
+    }
 }
 
 function createAppointment(e) {
@@ -175,56 +179,48 @@ function createAppointment(e) {
     })
     .then(resp => resp.json())
     .then(appointment => {
-        renderAppointment(pet, appointment)
+        renderCalendar(pet, appointment)
     })
 }
 
-function renderAppointment(pet, appointment) {
+function renderCalendar(pet, appointment) {
     const main = document.getElementById('info-form')
     main.setAttribute("style", "display: none;")
      
-    const header = document.createElement('h3')
-    header.textContent = 'Appointment List'
-    main.appendChild(header)
+    // const header = document.createElement('h3')
+    // header.textContent = 'Appointment List'
+    // main.appendChild(header)
 
     const calendar = document.querySelector('#calendar')
     calendar.setAttribute('style', '')
     populateCalendar(pet, appointment)
-
 }
 
 function populateCalendar(pet, appointment){
-    // set as global variables to repopulate calendar after pressing next/previous
+    // set as global variable to repopulate calendar after pressing next/previous
     apmnt = appointment
-    petName = pet.value
-
-    // const li = document.createElement('li')
-    // li.textContent = `${petName}`
-    // li.addEventListener('click', renderAppointmentDetails)
-    
-    // const appointmentList = document.createElement('ul')
-    // appointmentList.appendChild(li)
+    petName = pet
     
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
+    // add pet name to calendar at the matching date
     for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
         const li = document.createElement('li')
-        li.textContent = `${petName}`
+        li.textContent = `${petName.value}`
         li.addEventListener('click', renderAppointmentDetails)
-
+        
         const appointmentList = document.createElement('ul')
         appointmentList.appendChild(li)
 
         const startDate = document.getElementById(`0${i}`)
-        // debugger
         startDate.appendChild(appointmentList)
     }
 }
 
+// render new appointment details
 function renderAppointmentDetails(e) {
-    // debugger 
-    const info = document.getElementById('appointment-info')
-    info.innerHTML = ''
+    // const info = document.getElementById('appointment-info')
+    // info.innerHTML = ''
     
     const name = document.createElement('li')
     name.textContent = `Hooman Name: ${userName.name.split('')[0].toUpperCase() + userName.name.slice(1)}`
@@ -238,12 +234,151 @@ function renderAppointmentDetails(e) {
     const endDate = document.createElement('li')
     endDate.textContent = `End Date: ${apmnt.end_date}`
 
-    const apmntDetails = document.createElement('ul')
-    apmntDetails.append(name, pet, startDate, endDate)
+    const header = document.createElement('h2')
+    header.textContent = 'Appointment Details'
 
-    const apmntInfo = document.getElementById('appointment-info')
+    // reschedule button
+    const upadteBtn = document.createElement('button')
+    upadteBtn.textContent = 'Reschedule'
+    upadteBtn.setAttribute('class', 'btn btn-outline-primary col-sm-6')
+    upadteBtn.addEventListener('click', () => {
+        renderRescheduleForm()
+    })
+
+    // cancel button
+    const deleteBtn = document.createElement('button')
+    deleteBtn.textContent = 'Cancel'
+    deleteBtn.setAttribute('class', 'btn btn-outline-primary col-sm-6')
+    deleteBtn.addEventListener('click', deleteAppointment)
+
+    const apmntDetails = document.createElement('ul')
+    apmntDetails.append(header, name, pet, startDate, endDate, upadteBtn, deleteBtn)
+    
+    const apmntInfo = document.getElementById('info')
+    apmntInfo.innerHTML = ''
     apmntInfo.appendChild(apmntDetails)
 }
+
+// render a rechedule form with start date and end date
+function renderRescheduleForm() {
+    const content = `
+    <form id='reschedule-form'>
+        <div class="form-group">
+            <label id='name'>Name: ${userName.name}</label>
+        </div>
+
+        <div class="form-group">
+            <label id='pet-name'>Pet name: ${petName.value}</label>
+        </div>
+
+        <div class="form-group">
+            <label>Start Date: </label>
+            <input type="date" class="form-control" id="new-start-date" required>
+        </div>
+
+        <div class="form-group">
+            <label>End Date: </label>
+            <input type="date" class="form-control" id="new-end-date" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Confirm</button>
+    </form>`
+
+    const rescheduleForm = document.getElementById('reschedule-form')
+    rescheduleForm.innerHTML = content
+    addEventForResForm()
+
+    const appointmentInfo = document.getElementById('info')
+    appointmentInfo.setAttribute('style', 'display: none;')
+}
+
+// add submit event for reschedule form
+function addEventForResForm() {
+    const form = document.getElementById('reschedule-form')
+    form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const newStartDate = e.target.querySelector('#new-start-date').value
+        const newEndDate = e.target.querySelector('#new-end-date').value
+        const id = apmnt.id
+        fetch(APMNT_URL + '/' + id, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type' : 'application/json',
+                'Accept' : 'application/json'
+            },
+            body: JSON.stringify({
+                start_date: newStartDate,
+                end_date: newEndDate
+            })
+        })
+        .then(resp => resp.json())
+        .then(data => populateAppointmentWithNewData(data))
+    })
+}
+
+// populate page with updated appointment data
+function populateAppointmentWithNewData(data){
+    console.log(data, apmnt, userName, petName)
+
+    // hide reschedule form
+    const rescheduleForm = document.getElementById('reschedule-form')
+    rescheduleForm.setAttribute('style', 'display: none;')
+
+    // populate page with updated data optimistically
+    const appointmentInfo = document.getElementById('info')
+    appointmentInfo.setAttribute('style', '')
+
+    const startDate = appointmentInfo.querySelectorAll('li')[2]
+    startDate.textContent = `Start Date: ${data.start_date}`
+    
+    const endDate = document.getElementById('info').querySelectorAll('li')[3]
+    endDate.textContent = `End Date: ${data.end_date}`
+}
+
+// cancel appointment
+function deleteAppointment(e) {
+    const id = apmnt.id
+    fetch(APMNT_URL + '/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json'
+        }
+    })
+    const appointmentInfo = document.getElementById('info')
+    appointmentInfo.innerHTML = ''
+
+    const calendar = document.getElementById('calendar')
+    calendar.setAttribute('style', 'display: none;')
+
+    const mainPage = document.getElementById('info-form')
+    mainPage.setAttribute('style', '')
+
+    const appointmentForm = document.getElementById('appointment-form')
+    appointmentForm.setAttribute('style', 'display: none;')
+
+    // clear pet names on calendar when delete
+    // emptyCalendar(petName, apmnt)
+}
+
+// function emptyCalendar(pet, appointment){ 
+//     const sDate = appointment.start_date.split('-')[2]
+//     const eDate = appointment.end_date.split('-')[2]
+//     // remove pet name to calendar at the matching date
+//     for(let i = parseInt(sDate); i < (parseInt(eDate[1])+1); i+=1){
+//         const li = document.createElement('li')
+//         li.textContent = `${pet.value}`
+//         li.addEventListener('click', renderAppointmentDetails)
+
+//         const appointmentList = document.createElement('ul')
+//         appointmentList.appendChild(li)
+
+//         const startDate = document.getElementById(`0${i}`)
+//         startDate.appendChild(appointmentList)
+//     }
+// }
+
+// CALENDAR
 
 let today = new Date();
 let currentMonth = today.getMonth();
