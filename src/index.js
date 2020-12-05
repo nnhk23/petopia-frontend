@@ -24,7 +24,7 @@ function getUser() {
 
     const submitBtn = document.createElement('button')
     submitBtn.type = 'submit'
-    submitBtn.setAttribute('class', 'btn btn-primary')
+    submitBtn.setAttribute('class', 'btn btn-info')
     submitBtn.textContent = 'Submit'
 
     const userForm = document.createElement('form')
@@ -149,36 +149,51 @@ function renderInfo(pet) {
     const appointmentForm = document.getElementById('appointment-form')
     appointmentForm.innerHTML = ''
 
+    const calendar = document.getElementById('calendar')
+    calendar.setAttribute('style', 'display:none;')
+
+    const header = document.createElement('h2')
+    header.textContent = 'Pet Details'
+
     const pic = document.createElement('img')
     pic.setAttribute('src', pet.img_url)
-    pic.setAttribute('width', '450px')
-    pic.setAttribute('height', '350px')
+    pic.id = 'pet-portrait'
 
     const name = document.createElement('li')
     name.textContent = `Name: ${pet.name}`
+    name.setAttribute('class', "list-group-item")
 
     const breed = document.createElement('li')
     breed.textContent = `Breed: ${pet.breed}`
+    breed.setAttribute('class', "list-group-item")
 
     const age = document.createElement('li')
     age.textContent = `Age: ${pet.age}`
+    age.setAttribute('class', "list-group-item")
 
     const kidFriendly = document.createElement('li')
     kidFriendly.textContent = `Kid Friendly: ${pet.kid_friendly}`
+    kidFriendly.setAttribute('class', "list-group-item")
 
     const personality = document.createElement('li')
     personality.textContent = `Personality: ${pet.personality}`
+    personality.setAttribute('class', "list-group-item")
+
+    const description = document.createElement('li')
+    description.textContent = `Pet Description: ${pet.description}`
+    description.setAttribute('class', "list-group-item")
 
     const selectBtn = document.createElement('button')
     selectBtn.textContent = 'Choose this fur ball'
-    selectBtn.setAttribute('class', 'btn btn-primary')
+    selectBtn.setAttribute('class', 'btn btn-info')
     selectBtn.addEventListener('click', () => {
         renderForm(pet)
     })
     
     const ul = document.createElement('ul')
     ul.id = 'individual-pet-info'
-    ul.append(name, breed, age, kidFriendly, personality, selectBtn)
+    ul.setAttribute('class', 'list-group list-group-flush')
+    ul.append(header, name, breed, age, kidFriendly, personality, description, selectBtn)
 
     const petInfo = document.getElementById('pet-info')
     petInfo.innerHTML = ''
@@ -208,7 +223,7 @@ function renderForm(pet) {
             <input type="date" class="form-control" id="end-date" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-info">Submit</button>
     </form>`
 
     const formHolder = document.getElementById('appointment-form')
@@ -348,7 +363,7 @@ function renderRescheduleForm() {
             <input type="date" class="form-control" id="new-end-date" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Confirm</button>
+        <button type="submit" class="btn btn-info">Confirm</button>
     </form>`
 
     const rescheduleForm = document.getElementById('reschedule-form')
@@ -516,6 +531,7 @@ function showCalendar(month, year) {
                 // debugger
                 let cell = document.createElement("td");
                 `${date}`.length > 1 ? cell.id = `${date}` : cell.id = `0${date}`
+                cell.setAttribute('style', "height:115px;width:115px")
                 let cellText = document.createTextNode(date);
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
                     cell.classList.add("bg-info1");
