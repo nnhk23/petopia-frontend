@@ -8,8 +8,14 @@ let petName
 document.addEventListener('DOMContentLoaded', () => {
     getUser()
 
+    const homePage = document.getElementById('petopia')
+    homePage.addEventListener('click', renderMainPage)
+
     const appointmentForm = document.getElementById('appointment-form')
     appointmentForm.addEventListener('submit', createAppointment)
+
+    const rescheduleForm = document.getElementById('reschedule-form')
+    rescheduleForm.addEventListener('submit', renderNewAppointment)
 })
 
 function getUser() {
@@ -59,6 +65,7 @@ function createUser(e) {
     e.target.reset()
 }
 
+// replace sign-in box with user greeting
 function renderGreeting(user) {  
     userName = user
     const greeting = document.querySelector('h5')
@@ -72,22 +79,69 @@ function renderGreeting(user) {
     viewAppointments.setAttribute('class', 'btn btn-info')
     viewAppointments.addEventListener('click', renderAllAppointments)
 
+    // log out button
+    const signOutBtn = document.getElementById('sign-out-btn')
+    signOutBtn.textContent = 'Sign Out'
+    signOutBtn.setAttribute('style', '')
+    signOutBtn.addEventListener('click', () => {
+        document.location.reload()
+    })
+
     const buttonHolder = document.getElementById('left-nav')
     buttonHolder.appendChild(viewAppointments)
 }
 
-function renderAllAppointments(e) {
+function renderMainPage(){
+    const infoForm = document.getElementById('info-form')
+    infoForm.setAttribute('style', '')
+
     const petInfo = document.getElementById('pet-info')
+    petInfo.setAttribute('style', '')
     petInfo.innerHTML = ''
 
+    const appointmentForm = document.getElementById('appointment-form')
+    appointmentForm.setAttribute('style', 'display: none;')
+
     const calendar = document.getElementById('calendar')
-    calendar.setAttribute('style', '')
+    calendar.setAttribute('style', 'display: none;')
+
+    const appointmentInfo = document.getElementById('appointment-info')
+    appointmentInfo.setAttribute('style', 'display: none;')
+
+    const allApmnt = document.getElementById('all-appointments')
+    allApmnt.setAttribute('style', 'display: none;')
+}
+
+// show list of all appointments
+function renderAllAppointments() {
+    const petInfo = document.getElementById('pet-info')
+    petInfo.innerHTML = ''
 
     const id = userName.id
 
     fetch(USERS_URL + '/' + id)
     .then(resp => resp.json())
-    .then(data => populateAllAppointments(data))
+    .then(data => {
+        console.log(data)
+        const header = document.createElement('h3')
+        header.textContent = 'List Of Booked Appointments'
+
+        const appointmentList = document.createElement('ul')
+        appointmentList.id = 'pet-names-holder'
+        data.pets.forEach(pet => {
+            const name = document.createElement('li')
+            name.textContent = pet.name
+            name.id = 'all-appointments-pet-name'
+            name.setAttribute('class', 'list-group-item list-group-item-action list-group-item-info')
+
+            appointmentList.appendChild(name)
+        })
+
+        const list = document.getElementById('all-appointments')
+        list.innerHTML = ''
+        list.setAttribute('style', '')
+        list.append(header, appointmentList)
+    })
 }
 
 function populateAllAppointments(data) {
@@ -97,7 +151,6 @@ function populateAllAppointments(data) {
         data.pets.forEach(pet => {
             if (pet.id == appointment.pet_id){
                 objName = pet.name
-                debugger
             }
         })
         const sDate = appointment.start_date.split('-')[2]
@@ -135,7 +188,6 @@ function getPetData() {
 }
 
 function generatePet(pet) {  
-
     const pic = document.createElement('img')
     pic.setAttribute('src', pet.img_url)
     pic.setAttribute('class', 'cat-pic')
@@ -146,6 +198,9 @@ function generatePet(pet) {
 }
 
 function renderInfo(pet) {
+    const allApmnt = document.getElementById('all-appointments')
+    allApmnt.setAttribute('style', 'display:none;')
+
     const appointmentForm = document.getElementById('appointment-form')
     appointmentForm.innerHTML = ''
 
@@ -255,24 +310,28 @@ function createAppointment(e) {
     .then(resp => resp.json())
     .then(appointment => {
         renderCalendar(pet, appointment)
+        renderAppointmentDetails(appointment)
     })
 }
 
 function renderCalendar(pet, appointment) {
+    petName = pet
     const main = document.getElementById('info-form')
     main.setAttribute("style", "display: none;")
  
     const calendar = document.querySelector('#calendar')
     calendar.setAttribute('style', '')
-    populateCalendar(pet, appointment)
+    fetch(APMNT_URL + '/' + `${appointment.id}`)
+    .then(resp => resp.json())
+    .then(data => {
+        populateCalendar(data)
+    })
 }
 
-function populateCalendar(pet, appointment){
+function populateCalendar(appointment){
     // set as global variable to repopulate calendar after pressing next/previous
-    // debugger
     if (!apmnt){
         apmnt = appointment
-        petName = pet
     }
     // get day only from start/end date
     const sDate = appointment.start_date.split('-')[2]
@@ -284,12 +343,17 @@ function populateCalendar(pet, appointment){
     for(let i = parseInt(sDate); i < limit; i+=1){
         const li = document.createElement('li')
         li.textContent = `${petName.value}`
-        li.addEventListener('click', renderAppointmentDetails)
+        li.addEventListener('click', () => {
+            const apmntInfo = document.getElementById('info')
+            apmntInfo.setAttribute('style', '')
+        })
         
         const appointmentList = document.createElement('ul')
         appointmentList.appendChild(li)
         // id for appointment delete function
-        appointmentList.id = `${i}`
+        let ulId
+        `${i}`.length > 1 ? ulId = `0${i}` : ulId = `${i}`
+        appointmentList.id = ulId
         appointmentList.setAttribute('class', 'apt-list-item') 
 
         let startDate
@@ -299,18 +363,22 @@ function populateCalendar(pet, appointment){
 }
 
 // render new appointment details
-function renderAppointmentDetails(e) {
+function renderAppointmentDetails(appointment) {
     const name = document.createElement('li')
     name.textContent = `Hooman Name: ${userName.name.split('')[0].toUpperCase() + userName.name.slice(1)}`
+    name.setAttribute('class', "theme-purple")
     
     const pet = document.createElement('li')
-    pet.textContent = `Pet Name: ${e.target.textContent}`
+    pet.textContent = `Pet Name: ${petName.value}`
+    pet.setAttribute('class', "theme-purple")
     
     const startDate = document.createElement('li')
-    startDate.textContent = `Start Date: ${apmnt.start_date}`
+    startDate.textContent = `Start Date: ${appointment.start_date}`
+    startDate.setAttribute('class', "theme-purple")
     
     const endDate = document.createElement('li')
-    endDate.textContent = `End Date: ${apmnt.end_date}`
+    endDate.textContent = `End Date: ${appointment.end_date}`
+    endDate.setAttribute('class', "theme-purple")
 
     const header = document.createElement('h2')
     header.textContent = 'Appointment Details'
@@ -318,7 +386,7 @@ function renderAppointmentDetails(e) {
     // reschedule button
     const upadteBtn = document.createElement('button')
     upadteBtn.textContent = 'Reschedule'
-    upadteBtn.setAttribute('class', 'btn btn-outline-primary col-sm-6')
+    upadteBtn.setAttribute('class', 'btn btn btn btn-outline-secondary col-sm-6')
     upadteBtn.addEventListener('click', () => {
         renderRescheduleForm()
     })
@@ -326,7 +394,7 @@ function renderAppointmentDetails(e) {
     // cancel button
     const deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'Cancel'
-    deleteBtn.setAttribute('class', 'btn btn-outline-primary col-sm-6')
+    deleteBtn.setAttribute('class', 'btn btn btn btn-outline-secondary col-sm-6')
 
     // set confirmation for delete
     // deleteBtn.setAttribute('onclick', "return confirm('Are you sure about canceling me :'(?');")
@@ -338,6 +406,11 @@ function renderAppointmentDetails(e) {
     
     const apmntInfo = document.getElementById('info')
     apmntInfo.innerHTML = ''
+
+    const infoHolder = document.getElementById('appointment-info')
+    infoHolder.setAttribute('style', '')
+    // hide appointment details temporary, waiting for click event
+    apmntInfo.setAttribute('style', 'display: none;')
     apmntInfo.appendChild(apmntDetails)
 }
 
@@ -368,38 +441,35 @@ function renderRescheduleForm() {
 
     const rescheduleForm = document.getElementById('reschedule-form')
     rescheduleForm.innerHTML = content
-    addEventForResForm()
+
+    // add submit event for reschedule form
+    rescheduleForm.setAttribute('style', '')
 
     // hide appointment info
     const appointmentInfo = document.getElementById('info')
     appointmentInfo.setAttribute('style', 'display: none;')
 }
 
-// add submit event for reschedule form
-function addEventForResForm() {
-    const form = document.getElementById('reschedule-form')
-    form.setAttribute('style', '')
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        const newStartDate = e.target.querySelector('#new-start-date').value
-        const newEndDate = e.target.querySelector('#new-end-date').value
-        const id = apmnt.id
-        fetch(APMNT_URL + '/' + id, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type' : 'application/json',
-                'Accept' : 'application/json'
-            },
-            body: JSON.stringify({
-                start_date: newStartDate,
-                end_date: newEndDate
-            })
+function renderNewAppointment(e) {
+    e.preventDefault()
+    const newStartDate = e.target.querySelector('#new-start-date').value
+    const newEndDate = e.target.querySelector('#new-end-date').value
+    const id = apmnt.id
+    fetch(APMNT_URL + '/' + id, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json'
+        },
+        body: JSON.stringify({
+            start_date: newStartDate,
+            end_date: newEndDate
         })
-        .then(resp => resp.json())
-        .then(data => {
-            populateAppointmentWithNewData(data)
-            updateCalendar(data)
-        })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        populateAppointmentWithNewData(data)
+        updateCalendar(data)
     })
 }
 
@@ -424,7 +494,7 @@ function populateAppointmentWithNewData(data){
 function updateCalendar(data){
     // empty out calendar
     emptyCalendar(apmnt)
-    populateCalendar(petName, data)
+    populateCalendar(data)
 }
 
 // cancel appointment
@@ -456,13 +526,30 @@ function deleteAppointment() {
 function emptyCalendar(appointment){ 
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
-
+    
     let limit
     eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
+
     // remove pet name to calendar at the matching date
     for(let i = parseInt(sDate); i < limit; i+=1){
-        const appointmentList = document.getElementById(`${i}`)
-        appointmentList.innerHTML = ''
+        // check date's length to grab the right ul through id
+        let num
+        `${i}`.length > 1 ? num = `0${i}` : num = `${i}`
+        // let appointmentList = document.getElementById(num)
+        const appointmentList = document.getElementById(num)
+        if (!appointmentList.innerHTML === ''){
+            appointmentList.innerHTML = ''
+        } else {
+            for(let a = 1; a < 32; a+=1){
+                // console.log('i hit small for loop')
+                let n
+                `${a}`.length > 1 ? n = `0${a}` : n = `${a}`
+                if (!!document.getElementById(n)){
+                    const appointmentList = document.getElementById(n)
+                    appointmentList.innerHTML = ''
+                }
+            }
+        }
     }
 }
 
@@ -528,7 +615,6 @@ function showCalendar(month, year) {
             }
 
             else {
-                // debugger
                 let cell = document.createElement("td");
                 `${date}`.length > 1 ? cell.id = `${date}` : cell.id = `0${date}`
                 cell.setAttribute('style', "height:115px;width:115px")
@@ -544,4 +630,3 @@ function showCalendar(month, year) {
         tbl.appendChild(row); // appending each row into calendar body.
     }
 }
-

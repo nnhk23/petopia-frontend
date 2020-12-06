@@ -20,15 +20,18 @@
 <body>
   <nav class="navbar navbar-dark" style="background-color: #4c4f5f;" id="topNav">
     <div class="container-1" id='left-nav'>
-      <a class="navbar-brand" href="#">
-        <img src="https://image.pngaaa.com/991/238991-middle.png" width="60" height="40" class="d-inline-block align-top" alt="" id='logo'>
-        <h3>PETOPIA</h3>
-      </a>
+      <div class="navbar-brand" href="#">
+        <img src="./pic/5.png" width="75" height="75" class="d-inline-block align-top" alt="" id='logo'>
+        <h3 id='petopia'>PETOPIA</h3>
+      </div>
     </div>
     <div>
       <h5 class='navbar-brand'>
           <!-- Greeting goes here -->
       </h5>
+      <button class="btn btn-outline-danger" id='sign-out-btn' style='display: none;'>
+        <!-- sign out button goes here -->
+      </button>
     </div>
   </nav>
 
@@ -125,12 +128,16 @@
 
     <div id='appointment-info'>
       <div id='info'>
-        <!-- appointment details will go here -->
+        <!-- appointment details goes here -->
       </div>
 
       <div id='reschedule-form'>
         <!-- rechedule form goes here -->
       </div>
+    </div>
+
+    <div id='all-appointments'>
+      <!-- list of appointments goes here -->
     </div>
 
     <!-- <button name="jump" onclick="jump()">Go</button> -->
