@@ -6,14 +6,14 @@
   <link rel="stylesheet" href="./styles.css">
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
   integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
   />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet">
 </head>
 
 
@@ -22,7 +22,7 @@
     <div class="container-1" id='left-nav'>
       <div class="navbar-brand" href="#">
         <img src="./pic/5.png" width="75" height="75" class="d-inline-block align-top" alt="" id='logo'>
-        <h3 id='petopia'>PETOPIA</h3>
+        <h3 id='petopia'>Petopia</h3>
       </div>
     </div>
     <div>
@@ -85,14 +85,17 @@
                 </tbody>
             </table>
 
+            <!-- next/previous button -->
             <div class="form-inline">
 
                 <button class="btn btn-outline-primary col-sm-6" id="previous" onclick="previous()">Previous</button>
 
                 <button class="btn btn-outline-primary col-sm-6" id="next" onclick="next()">Next</button>
             </div>
-            <br/>
-            <form class="form-inline">
+
+            <!-- jump to certain month/year form -->
+           <br/>
+           <form class="form-inline">
                 <label class="lead mr-2 ml-2" for="month">Jump To: </label>
                 <select class="form-control col-sm-4" name="month" id="month" onchange="jump()">
                     <option value=0>Jan</option>
@@ -127,6 +130,10 @@
     </div>
 
     <div id='appointment-info'>
+      <div id='all-appointments'>
+        <!-- list of appointments goes here -->
+      </div>
+      
       <div id='info'>
         <!-- appointment details goes here -->
       </div>
@@ -136,9 +143,6 @@
       </div>
     </div>
 
-    <div id='all-appointments'>
-      <!-- list of appointments goes here -->
-    </div>
 
     <!-- <button name="jump" onclick="jump()">Go</button> -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -152,8 +156,12 @@
     crossorigin="anonymous"></script>
     <script type="text/javascript" src="./src/index.js"></script>
 
+    <!-- footer -->
+    <footer>
+      <p>Made With ♥ by: </p>
+      <p>Kim Nguyen</p>
+    </footer>
   </div>
-</div>
-
+  </div>
 </body>
 </html>

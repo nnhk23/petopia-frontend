@@ -31,9 +31,11 @@ function getUser() {
     const submitBtn = document.createElement('button')
     submitBtn.type = 'submit'
     submitBtn.setAttribute('class', 'btn btn-info')
+    submitBtn.id = 'submit'
     submitBtn.textContent = 'Submit'
 
     const userForm = document.createElement('form')
+    userForm.setAttribute('class', 'form-group')
     userForm.append(label, user, submitBtn)
     userForm.addEventListener('submit', (e) => {
         createUser(e)
@@ -85,6 +87,7 @@ function renderGreeting(user) {
     signOutBtn.setAttribute('style', '')
     signOutBtn.addEventListener('click', () => {
         document.location.reload()
+        alert("See you again soon ♡♡♡!")
     })
 
     const buttonHolder = document.getElementById('left-nav')
@@ -112,30 +115,54 @@ function renderMainPage(){
     allApmnt.setAttribute('style', 'display: none;')
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+ }
+
 // show list of all appointments
-function renderAllAppointments() {
+async function renderAllAppointments() {
     const petInfo = document.getElementById('pet-info')
     petInfo.innerHTML = ''
 
-    const id = userName.id
+    const infos = document.getElementById('appointment-info')
+    infos.setAttribute('style', '')
 
+    console.log('hit render all appointments')
+
+    const id = userName.id
+    await sleep(500)
     fetch(USERS_URL + '/' + id)
     .then(resp => resp.json())
     .then(data => {
-        console.log(data)
+        console.log('data', data)
         const header = document.createElement('h3')
         header.textContent = 'List Of Booked Appointments'
 
         const appointmentList = document.createElement('ul')
         appointmentList.id = 'pet-names-holder'
-        data.pets.forEach(pet => {
+        if (data.pets.length === 0){
+            const content = document.createElement('p')
+            content.textContent = "Awwww shucks, you don't have any appointments booked yet :(. Let's start by clicking on our pet's icon!!!"
+            content.id = 'warning'
+
+            const doge = document.createElement('img')
+            doge.setAttribute('src', 'https://media.giphy.com/media/HCTfYH2Xk5yw/giphy.gif')
+
+            appointmentList.append(content, doge)
+        }
+        for(let i=0; i < data.pets.length; i+=1){
             const name = document.createElement('li')
-            name.textContent = pet.name
-            name.id = 'all-appointments-pet-name'
+            name.textContent = data.pets[i].name
             name.setAttribute('class', 'list-group-item list-group-item-action list-group-item-info')
+            name.id = 'all-appointments-pet-name'
+            name.addEventListener('click', (e) => {
+                console.log('click event', e.target)
+                console.log('appointment details', data.appointments[i])
+                renderApmntAndPet(e, data.appointments[i])
+            })
 
             appointmentList.appendChild(name)
-        })
+        }
 
         const list = document.getElementById('all-appointments')
         list.innerHTML = ''
@@ -144,8 +171,21 @@ function renderAllAppointments() {
     })
 }
 
+function renderApmntAndPet(e, appointment){
+    console.log(e.target)
+    petName = e.target
+    apmnt = appointment
+    // debugger
+    fetch(APMNT_URL + '/' + `${apmnt.id}`)
+    .then(resp => resp.json())
+    .then(data => {
+        renderAppointmentDetails(data)
+        const apmntInfo = document.getElementById('info')
+        apmntInfo.setAttribute('style', '')
+    })
+}
+
 function populateAllAppointments(data) {
-    console.log(data)
     let objName
     data.appointments.forEach(appointment => {
         data.pets.forEach(pet => {
@@ -214,6 +254,15 @@ function renderInfo(pet) {
     pic.setAttribute('src', pet.img_url)
     pic.id = 'pet-portrait'
 
+    const caption = document.createElement('p')
+    caption.textContent = 'click me for more details about pet.'
+    caption.id = 'pet-pic-caption'
+
+    const clickablePic = document.createElement('a')
+    clickablePic.setAttribute('href', pet.url)
+    clickablePic.setAttribute('target', '_blank')
+    clickablePic.append(pic, caption)
+
     const name = document.createElement('li')
     name.textContent = `Name: ${pet.name}`
     name.setAttribute('class', "list-group-item")
@@ -238,21 +287,26 @@ function renderInfo(pet) {
     description.textContent = `Pet Description: ${pet.description}`
     description.setAttribute('class', "list-group-item")
 
+    const contact = document.createElement('li')
+    contact.textContent = `Shelter's Email: ${pet.email}`
+    contact.setAttribute('class', "list-group-item")
+
     const selectBtn = document.createElement('button')
     selectBtn.textContent = 'Choose this fur ball'
     selectBtn.setAttribute('class', 'btn btn-info')
+    selectBtn.id = 'select-pet'
     selectBtn.addEventListener('click', () => {
         renderForm(pet)
     })
     
     const ul = document.createElement('ul')
     ul.id = 'individual-pet-info'
-    ul.setAttribute('class', 'list-group list-group-flush')
-    ul.append(header, name, breed, age, kidFriendly, personality, description, selectBtn)
+    ul.setAttribute('class', 'list-group1 list-group-flush')
+    ul.append(header, name, breed, age, kidFriendly, personality, description, contact, selectBtn)
 
     const petInfo = document.getElementById('pet-info')
     petInfo.innerHTML = ''
-    petInfo.append(pic, ul)
+    petInfo.append(clickablePic, ul)
 }
 
 function renderForm(pet) {
@@ -260,21 +314,21 @@ function renderForm(pet) {
     <h2>Appointment Form</h2>
     <form id='appointment-form'>
         <div class="form-group">
-            <label>Hooman Name: ${userName.name}</label>
+            <label><strong>Hooman Name:</strong> ${userName.name}</label>
         </div>
 
         <div class="form-group">
-            <label>Pet name: </label>
-            <input type="text" class="form-control" id="${pet.id}" value="${pet.name}">
+            <label><strong>Pet name: </strong></label>
+            <input type="text" class="form-control" id="${pet.id}" value="${pet.name}" disabled>
         </div>
 
         <div class="form-group">
-            <label>Start Date: </label>
+            <label><strong>Start Date: </strong></label>
             <input type="date" class="form-control" id="start-date" required>
         </div>
 
         <div class="form-group">
-            <label>End Date: </label>
+            <label><strong>End Date: </strong></label>
             <input type="date" class="form-control" id="end-date" required>
         </div>
 
@@ -329,6 +383,17 @@ function renderCalendar(pet, appointment) {
 }
 
 function populateCalendar(appointment){
+    // clear out calendar before populating
+    // for(let i = 1; i < 32; i+=1){
+    //     let n
+    //     `${i}`.length > 1 ? n = `0${i}` : n = `${i}`
+    //     if (!!document.getElementById(n)){
+    //         const appointmentList = document.getElementById(n)
+    //         appointmentList.innerHTML = ''
+    //     }
+    //     console.log('clear calendar')
+    // }
+    emptyCalendar(appointment)
     // set as global variable to repopulate calendar after pressing next/previous
     if (!apmnt){
         apmnt = appointment
@@ -369,8 +434,8 @@ function renderAppointmentDetails(appointment) {
     name.setAttribute('class', "theme-purple")
     
     const pet = document.createElement('li')
-    pet.textContent = `Pet Name: ${petName.value}`
     pet.setAttribute('class', "theme-purple")
+    !!petName.value ? pet.textContent = `Pet Name: ${petName.value}` : pet.textContent = `Pet Name: ${petName.textContent}`
     
     const startDate = document.createElement('li')
     startDate.textContent = `Start Date: ${appointment.start_date}`
@@ -395,23 +460,28 @@ function renderAppointmentDetails(appointment) {
     const deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'Cancel'
     deleteBtn.setAttribute('class', 'btn btn btn btn-outline-secondary col-sm-6')
-
-    // set confirmation for delete
-    // deleteBtn.setAttribute('onclick', "return confirm('Are you sure about canceling me :'(?');")
-
-    deleteBtn.addEventListener('click', deleteAppointment)
+    deleteBtn.addEventListener('click', () => {
+        let ans = confirm("Are you 10000% sure to cancel me? :(")
+        // delete button confirmation
+        if (ans == true) {
+            deleteAppointment()
+            let petObj
+            !!petName.value ? petObj = petName.value : petObj = petName.textContent
+            alert(`Appointment with ${petObj} is cancelled.`)
+        }
+    })
 
     const apmntDetails = document.createElement('ul')
     apmntDetails.append(header, name, pet, startDate, endDate, upadteBtn, deleteBtn)
     
     const apmntInfo = document.getElementById('info')
     apmntInfo.innerHTML = ''
-
-    const infoHolder = document.getElementById('appointment-info')
-    infoHolder.setAttribute('style', '')
     // hide appointment details temporary, waiting for click event
     apmntInfo.setAttribute('style', 'display: none;')
     apmntInfo.appendChild(apmntDetails)
+
+    const infoHolder = document.getElementById('appointment-info')
+    infoHolder.setAttribute('style', '')
 }
 
 // render a rechedule form with start date and end date
@@ -519,6 +589,11 @@ function deleteAppointment() {
     const appointmentForm = document.getElementById('appointment-form')
     appointmentForm.setAttribute('style', 'display: none;')
 
+    // const allApmnt = document.getElementById('pet-names-holder')
+    // console.log('inside delete appointment',allApmnt)
+    // debugger
+    renderAllAppointments()
+
     // clear pet names on calendar when delete
     emptyCalendar(apmnt)
 }
@@ -535,13 +610,13 @@ function emptyCalendar(appointment){
         // check date's length to grab the right ul through id
         let num
         `${i}`.length > 1 ? num = `0${i}` : num = `${i}`
-        // let appointmentList = document.getElementById(num)
-        const appointmentList = document.getElementById(num)
-        if (!appointmentList.innerHTML === ''){
+        // check if date is clear of pet's name
+        if (document.getElementById(num) && !document.getElementById(num).innerHTML === ''){
+            const appointmentList = document.getElementById(num)
             appointmentList.innerHTML = ''
         } else {
+            // clear out all pet's name
             for(let a = 1; a < 32; a+=1){
-                // console.log('i hit small for loop')
                 let n
                 `${a}`.length > 1 ? n = `0${a}` : n = `${a}`
                 if (!!document.getElementById(n)){
@@ -630,3 +705,11 @@ function showCalendar(month, year) {
         tbl.appendChild(row); // appending each row into calendar body.
     }
 }
+// TODO:
+// [x] GET DOG DATAS
+// [] style petopia home page to the middle
+// [x] work on all appointments clickable link
+// [] work on sorting button
+// [] more styling
+// [] add cursor pointer + change color of pet's name in calendar on hover
+// [x] add REAL URL to cat photo?

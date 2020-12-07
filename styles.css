@@ -2,6 +2,11 @@ body {
   margin: 0;
 }
 
+#petopia{
+  font-family: 'Sacramento', cursive;
+  font-size: 50px;
+}
+
 h5{
   font-style: italic;
 }
@@ -14,7 +19,7 @@ h5{
 #pet-list{
   background-color: #c9889a;
   margin: 0;
-  width: 110%;
+  width: 100%;
   padding-left: 15px;
 }
 
@@ -35,6 +40,7 @@ h5{
 .callout {
   background-color: #f9f0e4;
   padding: 30px 0px 0px 70px;
+  height: auto;
 }
 
 .cat-pic{
@@ -51,8 +57,8 @@ h5{
 }
 
 .cat-pic:hover{
-  animation: rubberBand;
-  animation-duration: 1s;
+  animation: heartBeat;
+  animation-duration: 3s;
 }
 
 .side-nav{
@@ -87,6 +93,29 @@ h3{
   box-shadow: -1px -4px 13px -7px #f0dddd, 5px 5px 15px 5px rgb(173 158 139);
 }
 
+#pet-pic-caption{
+  text-align: center;
+  font-style: italic;
+  font-size: small;
+}
+
+#list-group1{
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-left: 0;
+  margin-bottom: 0;
+  margin-left: 55px;
+}
+
+a{
+  text-align: center;
+}
+
+#select-pet{
+  margin: 10px;
+}
+
 /* appointment form */
 
 #appointment-form{
@@ -98,9 +127,9 @@ h3{
 
 #info{
   margin-left: auto;
-  margin-right: 180px;
+  margin-right: 262px;
   margin-top: 20px;
-  width: 75%;
+  width: 70%;
 }
 
 .theme-purple{
@@ -114,14 +143,15 @@ h3{
 
 /* reschedule form */
 #reschedule-form{
-  width: 50%;
-  margin: 20px;
+  width: 82%;
+  margin: auto;
+  padding-top: 20px;
 }
 
 /* CALENDAR */
 .card{
-  width: 1200px;
   height: fit-content;
+  background-color: #fff9f6;
 }
 
 table{
@@ -155,5 +185,24 @@ table{
 
 #pet-names-holder{
   width: 70%;
+}
 
+#warning {
+  font-style: italic;
+}
+
+/* footer */
+footer {
+  text-align: center;
+  padding: 3px;
+  line-height: 60%;
+  color: rgb(146 138 138 / 57%);
+  position: fixed;        
+  bottom: 0px; 
+  width: 90%;
+}
+
+/* user sign in */
+#submit{
+  margin-top: 12px;
 }
