@@ -726,11 +726,3 @@ function showCalendar(month, year) {
         tbl.appendChild(row); // appending each row into calendar body.
     }
 }
-// TODO:
-// [x] GET DOG DATAS
-// [x] style petopia home page to the middle
-// [x] work on all appointments clickable link
-// [] work on sorting button
-// [x] more styling
-// [x] add cursor pointer + change color of pet's name in calendar on hover
-// [x] add REAL URL to cat photo?
