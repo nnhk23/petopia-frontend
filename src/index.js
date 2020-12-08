@@ -25,8 +25,9 @@ function getUser() {
     const user = document.createElement('input')
     user.type = 'text'
     user.setAttribute('class', 'form-control')
-    user.id = 'user'
+    user.setAttribute('placeholder', 'your name here')
     user.setAttribute('required', '')
+    user.id = 'user'
 
     const submitBtn = document.createElement('button')
     submitBtn.type = 'submit'
@@ -70,7 +71,7 @@ function createUser(e) {
 // replace sign-in box with user greeting
 function renderGreeting(user) {  
     userName = user
-    const greeting = document.querySelector('h5')
+    const greeting = document.querySelector('h4')
     greeting.textContent = `Welcome ${user.name} to Petopia!`
 
     const input = document.getElementById('user-sign-in')
@@ -78,6 +79,7 @@ function renderGreeting(user) {
 
     const viewAppointments = document.createElement('button')
     viewAppointments.textContent = 'View All Appointments'
+    viewAppointments.id = 'view-all-apmnt-btn'
     viewAppointments.setAttribute('class', 'btn btn-info')
     viewAppointments.addEventListener('click', renderAllAppointments)
 
@@ -127,7 +129,8 @@ async function renderAllAppointments() {
     const infos = document.getElementById('appointment-info')
     infos.setAttribute('style', '')
 
-    console.log('hit render all appointments')
+    const details = document.getElementById('info')
+    details.setAttribute('style', 'display: none;')
 
     const id = userName.id
     await sleep(500)
@@ -135,8 +138,9 @@ async function renderAllAppointments() {
     .then(resp => resp.json())
     .then(data => {
         console.log('data', data)
-        const header = document.createElement('h3')
+        const header = document.createElement('h2')
         header.textContent = 'List Of Booked Appointments'
+        header.id = 'booked-appointment'
 
         const appointmentList = document.createElement('ul')
         appointmentList.id = 'pet-names-holder'
@@ -146,6 +150,7 @@ async function renderAllAppointments() {
             content.id = 'warning'
 
             const doge = document.createElement('img')
+            doge.id = 'doge'
             doge.setAttribute('src', 'https://media.giphy.com/media/HCTfYH2Xk5yw/giphy.gif')
 
             appointmentList.append(content, doge)
@@ -175,11 +180,12 @@ function renderApmntAndPet(e, appointment){
     console.log(e.target)
     petName = e.target
     apmnt = appointment
-    // debugger
     fetch(APMNT_URL + '/' + `${apmnt.id}`)
     .then(resp => resp.json())
     .then(data => {
         renderAppointmentDetails(data)
+        const deleteBtn = document.getElementById('delete-btn')
+        deleteBtn.setAttribute('style', '')
         const apmntInfo = document.getElementById('info')
         apmntInfo.setAttribute('style', '')
     })
@@ -383,16 +389,6 @@ function renderCalendar(pet, appointment) {
 }
 
 function populateCalendar(appointment){
-    // clear out calendar before populating
-    // for(let i = 1; i < 32; i+=1){
-    //     let n
-    //     `${i}`.length > 1 ? n = `0${i}` : n = `${i}`
-    //     if (!!document.getElementById(n)){
-    //         const appointmentList = document.getElementById(n)
-    //         appointmentList.innerHTML = ''
-    //     }
-    //     console.log('clear calendar')
-    // }
     emptyCalendar(appointment)
     // set as global variable to repopulate calendar after pressing next/previous
     if (!apmnt){
@@ -460,13 +456,17 @@ function renderAppointmentDetails(appointment) {
     const deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'Cancel'
     deleteBtn.setAttribute('class', 'btn btn btn btn-outline-secondary col-sm-6')
+    deleteBtn.setAttribute('style', 'display: none;')
+    deleteBtn.id = 'delete-btn'
     deleteBtn.addEventListener('click', () => {
         let ans = confirm("Are you 10000% sure to cancel me? :(")
         // delete button confirmation
         if (ans == true) {
             deleteAppointment()
+
             let petObj
             !!petName.value ? petObj = petName.value : petObj = petName.textContent
+
             alert(`Appointment with ${petObj} is cancelled.`)
         }
     })
@@ -562,7 +562,6 @@ function populateAppointmentWithNewData(data){
 
 // move pet's name to updated date on calendar
 function updateCalendar(data){
-    // empty out calendar
     emptyCalendar(apmnt)
     populateCalendar(data)
 }
@@ -589,43 +588,50 @@ function deleteAppointment() {
     const appointmentForm = document.getElementById('appointment-form')
     appointmentForm.setAttribute('style', 'display: none;')
 
-    // const allApmnt = document.getElementById('pet-names-holder')
-    // console.log('inside delete appointment',allApmnt)
-    // debugger
+    // re-render updated appointment list
+    const allApmnt = document.getElementById('appointment-info')
+    allApmnt.setAttribute('style', 'display: none;')
+    
     renderAllAppointments()
-
     // clear pet names on calendar when delete
     emptyCalendar(apmnt)
 }
 
 function emptyCalendar(appointment){ 
-    const sDate = appointment.start_date.split('-')[2]
-    const eDate = appointment.end_date.split('-')[2]
+    // const sDate = appointment.start_date.split('-')[2]
+    // const eDate = appointment.end_date.split('-')[2]
     
-    let limit
-    eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
+    // let limit
+    // eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
 
     // remove pet name to calendar at the matching date
-    for(let i = parseInt(sDate); i < limit; i+=1){
+    // for(let i = parseInt(sDate); i < limit; i+=1){
         // check date's length to grab the right ul through id
-        let num
-        `${i}`.length > 1 ? num = `0${i}` : num = `${i}`
+        // let num
+        // `${i}`.length > 1 ? num = `0${i}` : num = `${i}`
         // check if date is clear of pet's name
-        if (document.getElementById(num) && !document.getElementById(num).innerHTML === ''){
-            const appointmentList = document.getElementById(num)
-            appointmentList.innerHTML = ''
-        } else {
+        // if (document.getElementById(num) && !document.getElementById(num).innerHTML === ''){
+        //     const appointmentList = document.getElementById(num)
+        //     appointmentList.innerHTML = ''
+        // } 
+        // else {
             // clear out all pet's name
-            for(let a = 1; a < 32; a+=1){
-                let n
-                `${a}`.length > 1 ? n = `0${a}` : n = `${a}`
-                if (!!document.getElementById(n)){
-                    const appointmentList = document.getElementById(n)
-                    appointmentList.innerHTML = ''
-                }
-            }
+    console.log('hit empty calendar')
+    for(let a = 1; a < 32; a+=1){
+        let n
+        let appointmentList
+        `${a}`.length > 1 ? n = `0${a}` : n = `${a}`
+        // debugger
+        
+        if (!!document.getElementById(n)){
+            appointmentList = document.getElementById(n)
+            // debugger
+            appointmentList.remove()
+            console.log('clearing calendar')
         }
     }
+        // }
+    // }
 }
 
 // CALENDAR
@@ -646,14 +652,30 @@ function next() {
     currentYear = (currentMonth === 11) ? currentYear + 1 : currentYear;
     currentMonth = (currentMonth + 1) % 12;
     showCalendar(currentMonth, currentYear);
-    // populateCalendar(petName, apmnt)
+    // debugger
+    populateCalendarBasedOnFullDate(currentMonth, currentYear, apmnt)
+}
+
+// populate calendar after clicking next/previous
+function populateCalendarBasedOnFullDate(month, year, appointment){
+    const currentMonth = (new Date(year, month)).getMonth() + 1
+    const sMonth = appointment.start_date.split('-')[1]
+
+    fetch(APMNT_URL + '/' + `${appointment.id}`)
+    .then(resp => resp.json())
+    .then(data =>{
+        console.log('updated appointment', data)
+        if (sMonth == currentMonth) {
+            populateCalendar(data)
+        }
+    })
 }
 
 function previous() {
     currentYear = (currentMonth === 0) ? currentYear - 1 : currentYear;
     currentMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
     showCalendar(currentMonth, currentYear);
-    // populateCalendar(petName, apmnt)
+    populateCalendarBasedOnFullDate(currentMonth, currentYear, apmnt)
 }
 
 function showCalendar(month, year) {
@@ -687,12 +709,11 @@ function showCalendar(month, year) {
             }
             else if (date > daysInMonth) {
                 break;
-            }
-
+            } 
             else {
                 let cell = document.createElement("td");
                 `${date}`.length > 1 ? cell.id = `${date}` : cell.id = `0${date}`
-                cell.setAttribute('style', "height:115px;width:115px")
+                cell.setAttribute('style', "height:115px;width:115px;border: 1px solid #c4b4a978;")
                 let cellText = document.createTextNode(date);
                 if (date === today.getDate() && year === today.getFullYear() && month === today.getMonth()) {
                     cell.classList.add("bg-info1");
@@ -707,9 +728,9 @@ function showCalendar(month, year) {
 }
 // TODO:
 // [x] GET DOG DATAS
-// [] style petopia home page to the middle
+// [x] style petopia home page to the middle
 // [x] work on all appointments clickable link
 // [] work on sorting button
-// [] more styling
-// [] add cursor pointer + change color of pet's name in calendar on hover
+// [x] more styling
+// [x] add cursor pointer + change color of pet's name in calendar on hover
 // [x] add REAL URL to cat photo?

@@ -25,10 +25,10 @@
         <h3 id='petopia'>Petopia</h3>
       </div>
     </div>
-    <div>
-      <h5 class='navbar-brand'>
+    <div id='welcome'>
+      <h4 class='navbar-brand'>
           <!-- Greeting goes here -->
-      </h5>
+      </h4>
       <button class="btn btn-outline-danger" id='sign-out-btn' style='display: none;'>
         <!-- sign out button goes here -->
       </button>
@@ -65,18 +65,18 @@
 
     <!-- CALENDAR -->
     <div class="container" style="display: none;" id='calendar'>
-        <div class="card">
+        <div class="card1">
             <h3 class="card-header" id="monthAndYear"></h3>
             <table class="table table-bordered table-responsive-sm" id="calendar">
                 <thead>
                 <tr>
-                    <th>Sun</th>
-                    <th>Mon</th>
-                    <th>Tue</th>
-                    <th>Wed</th>
-                    <th>Thu</th>
-                    <th>Fri</th>
-                    <th>Sat</th>
+                    <th style='border: 1px solid #c4b4a978;'>Sun</th>
+                    <th style='border: 1px solid #c4b4a978;'>Mon</th>
+                    <th style='border: 1px solid #c4b4a978;'>Tue</th>
+                    <th style='border: 1px solid #c4b4a978;'>Wed</th>
+                    <th style='border: 1px solid #c4b4a978;'>Thu</th>
+                    <th style='border: 1px solid #c4b4a978;'>Fri</th>
+                    <th style='border: 1px solid #c4b4a978;'>Sat</th>
                 </tr>
                 </thead>
 
@@ -88,9 +88,9 @@
             <!-- next/previous button -->
             <div class="form-inline">
 
-                <button class="btn btn-outline-primary col-sm-6" id="previous" onclick="previous()">Previous</button>
+                <button class="btn1 btn-warning1 col-sm-6" id="previous" onclick="previous()">Previous</button>
 
-                <button class="btn btn-outline-primary col-sm-6" id="next" onclick="next()">Next</button>
+                <button class="btn1 btn-warning1 col-sm-6" id="next" onclick="next()">Next</button>
             </div>
 
             <!-- jump to certain month/year form -->
@@ -133,7 +133,7 @@
       <div id='all-appointments'>
         <!-- list of appointments goes here -->
       </div>
-      
+
       <div id='info'>
         <!-- appointment details goes here -->
       </div>
