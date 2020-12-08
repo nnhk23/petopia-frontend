@@ -23,6 +23,23 @@
       <div class="navbar-brand" href="#">
         <img src="./pic/5.png" width="75" height="75" class="d-inline-block align-top" alt="" id='logo'>
         <h3 id='petopia'>Petopia</h3>
+        
+        <!-- drop down to sort pets -->
+        <div class="btn-group" id='dropdown-breed' style='display: none;'>
+          <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Species
+          </button>
+          <div class="dropdown-menu">
+            <option class="dropdown-item" id='cat' onclick="sortByCat()">Cat</option>
+            <option class="dropdown-item" id='dog' onclick="sortByDog()">Dog</option>
+            <option class="dropdown-item" id='dog' onclick="undoSort()">All Pets</option>
+          </div>
+        </div>
+
+        <button id='view-all-apmnt-btn' style='display: none;'>
+          <!-- view all appointment button -->
+        </button>
+        
       </div>
     </div>
     <div id='welcome'>

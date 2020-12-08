@@ -36,8 +36,9 @@ h4{
   height: 100px;
 }
 
-#view-all-apmnt-btn{
+#view-all-apmnt-btn, #dropdown-breed{
   margin-bottom: 25px;
+  margin-left: 10px;
 }
 
 #welcome{
@@ -59,7 +60,7 @@ h4{
   height: auto;
 }
 
-.cat-pic{
+.cat-pic, .dog-pic{
   margin: 10px 0 25px 10px;
   border-radius: 100px;
   border: solid;
@@ -74,6 +75,11 @@ h4{
 
 /* set animation for cat pic */
 .cat-pic:hover{
+  animation: heartBeat;
+  animation-duration: 3s;
+}
+
+.dog-pic:hover{
   animation: heartBeat;
   animation-duration: 3s;
 }
@@ -136,8 +142,9 @@ a{
 /* appointment form */
 
 #appointment-form{
-  width: 50%;
+  width: 88%;
   margin: 20px;
+  padding-left: 330px;
 }
 
 /* appointment details */

@@ -77,11 +77,14 @@ function renderGreeting(user) {
     const input = document.getElementById('user-sign-in')
     input.innerHTML = ''
 
-    const viewAppointments = document.createElement('button')
+    const viewAppointments = document.getElementById('view-all-apmnt-btn')
+    viewAppointments.setAttribute('style', '')
     viewAppointments.textContent = 'View All Appointments'
-    viewAppointments.id = 'view-all-apmnt-btn'
     viewAppointments.setAttribute('class', 'btn btn-info')
     viewAppointments.addEventListener('click', renderAllAppointments)
+
+    const dropdown = document.getElementById('dropdown-breed')
+    dropdown.setAttribute('style', '')
 
     // log out button
     const signOutBtn = document.getElementById('sign-out-btn')
@@ -91,9 +94,6 @@ function renderGreeting(user) {
         document.location.reload()
         alert("See you again soon ♡♡♡!")
     })
-
-    const buttonHolder = document.getElementById('left-nav')
-    buttonHolder.appendChild(viewAppointments)
 }
 
 function renderMainPage(){
@@ -191,6 +191,33 @@ function renderApmntAndPet(e, appointment){
     })
 }
 
+function sortByCat(){
+    const dogs = document.getElementsByClassName('dog-pic')
+    const cats = document.getElementsByClassName('cat-pic')
+    for(let i = 0; i < dogs.length; i+=1){
+        dogs[i].setAttribute('style', 'display:none;')
+        cats[i].setAttribute('style', '')
+    }
+}
+
+function sortByDog(){
+    const dogs = document.getElementsByClassName('dog-pic')
+    const cats = document.getElementsByClassName('cat-pic')
+    for(let i = 0; i < cats.length; i+=1){
+        cats[i].setAttribute('style', 'display:none;')
+        dogs[i].setAttribute('style', '')
+    }
+}
+
+function undoSort(){
+    const dogs = document.getElementsByClassName('dog-pic')
+    const cats = document.getElementsByClassName('cat-pic')
+    for(let i = 0; i < cats.length; i+=1){
+        cats[i].setAttribute('style', '')
+        dogs[i].setAttribute('style', '')
+    }
+}
+
 function populateAllAppointments(data) {
     let objName
     data.appointments.forEach(appointment => {
@@ -236,7 +263,7 @@ function getPetData() {
 function generatePet(pet) {  
     const pic = document.createElement('img')
     pic.setAttribute('src', pet.img_url)
-    pic.setAttribute('class', 'cat-pic')
+    pet.species == "Cat" ? pic.setAttribute('class', 'cat-pic') : pic.setAttribute('class', 'dog-pic')
     pic.addEventListener('click', () => renderInfo(pet))
 
     const list = document.querySelector('#list')
@@ -317,7 +344,7 @@ function renderInfo(pet) {
 
 function renderForm(pet) {
     const content = `
-    <h2>Appointment Form</h2>
+    <h2 style="padding-left: 345px;">Appointment Form</h2>
     <form id='appointment-form'>
         <div class="form-group">
             <label><strong>Hooman Name:</strong> ${userName.name}</label>
@@ -598,40 +625,18 @@ function deleteAppointment() {
 }
 
 function emptyCalendar(appointment){ 
-    // const sDate = appointment.start_date.split('-')[2]
-    // const eDate = appointment.end_date.split('-')[2]
-    
-    // let limit
-    // eDate.length > 1 ? limit = (parseInt(eDate)+1) : limit = (parseInt(eDate[1])+1)
-
-    // remove pet name to calendar at the matching date
-    // for(let i = parseInt(sDate); i < limit; i+=1){
-        // check date's length to grab the right ul through id
-        // let num
-        // `${i}`.length > 1 ? num = `0${i}` : num = `${i}`
-        // check if date is clear of pet's name
-        // if (document.getElementById(num) && !document.getElementById(num).innerHTML === ''){
-        //     const appointmentList = document.getElementById(num)
-        //     appointmentList.innerHTML = ''
-        // } 
-        // else {
-            // clear out all pet's name
+    // clear out all pet's name
     console.log('hit empty calendar')
     for(let a = 1; a < 32; a+=1){
         let n
         let appointmentList
-        `${a}`.length > 1 ? n = `0${a}` : n = `${a}`
-        // debugger
-        
+        `${a}`.length > 1 ? n = `0${a}` : n = `${a}`   
         if (!!document.getElementById(n)){
             appointmentList = document.getElementById(n)
-            // debugger
             appointmentList.remove()
             console.log('clearing calendar')
         }
     }
-        // }
-    // }
 }
 
 // CALENDAR
@@ -652,7 +657,6 @@ function next() {
     currentYear = (currentMonth === 11) ? currentYear + 1 : currentYear;
     currentMonth = (currentMonth + 1) % 12;
     showCalendar(currentMonth, currentYear);
-    // debugger
     populateCalendarBasedOnFullDate(currentMonth, currentYear, apmnt)
 }
 
@@ -703,6 +707,7 @@ function showCalendar(month, year) {
         for (let j = 0; j < 7; j++) {
             if (i === 0 && j < firstDay) {
                 let cell = document.createElement("td");
+                cell.setAttribute('style', "height:115px;width:115px;border: 1px solid #c4b4a978;")
                 let cellText = document.createTextNode("");
                 cell.appendChild(cellText);
                 row.appendChild(cell);
