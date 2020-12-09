@@ -418,9 +418,7 @@ function renderCalendar(pet, appointment) {
 function populateCalendar(appointment){
     emptyCalendar(appointment)
     // set as global variable to repopulate calendar after pressing next/previous
-    if (!apmnt){
-        apmnt = appointment
-    }
+    apmnt = appointment
     // get day only from start/end date
     const sDate = appointment.start_date.split('-')[2]
     const eDate = appointment.end_date.split('-')[2]
@@ -513,6 +511,8 @@ function renderAppointmentDetails(appointment) {
 
 // render a rechedule form with start date and end date
 function renderRescheduleForm() {
+    let pet
+    !!petName.value ? pet = `${petName.value}` : pet = `${petName.textContent}`
     const content = `
     <form id='reschedule-form'>
         <div class="form-group">
@@ -520,7 +520,7 @@ function renderRescheduleForm() {
         </div>
 
         <div class="form-group">
-            <label id='pet-name'>Pet name: ${petName.value}</label>
+            <label id='pet-name'>Pet name: ${pet}</label>
         </div>
 
         <div class="form-group">

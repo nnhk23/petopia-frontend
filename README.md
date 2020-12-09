@@ -1,25 +1,13 @@
-# README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
 # petopia-frontend
+* Please refer to petopia-backend through this repo: https://github.com/nnhk23/petopia-backend.
+
+# Instruction: 
+* Clone both repo: petopia-frontend and petopia-backend in a same folder.
+* Change directory to petopia-backend: ```cd petopia-backend```
+* Run ```ruby rails db:migrate``` and ```ruby rails db:seed```.
+* Start server: ```ruby rails s```.
+* Go back to parents folder by ```cd ..```.
+* Open petopia-frontend: ```cd petopia-frontend```
+* Open index.js file in browser: ```open index.html```
+* Enjoy Petopia App :). 
+
